@@ -4,9 +4,6 @@ import { character } from '../models'
 import { Avatar, Button, Card, Title, Paragraph } from 'react-native-paper';
 
 export default function characterCard(props: { character: character, navigation: any }) {
-    // function showDetails(character: character) {
-    //     props.navigation.navigate("Character Details");
-    // }
     return (
         <View>
             <Card mode='outlined' style={styles.card}>
@@ -16,7 +13,7 @@ export default function characterCard(props: { character: character, navigation:
                         <Card.Title style={{ width: '100%' }}
                             title={(props.character.name.length < 17) ? props.character.name : (props.character.name.substr(0, 15) + '..')}
                             subtitle={props.character.status + ' - ' + props.character.species} />
-                        <Card.Actions>
+                        <Card.Actions style={styles.action}>
                             <Button mode="outlined" onPress = {() => props.navigation.navigate("Character Details", {character: props.character})}>Details</Button>
                         </Card.Actions>
                     </View>
@@ -33,6 +30,9 @@ const styles = StyleSheet.create({
         marginBottom: 4,
         marginTop: 4
     },
+    action: {
+        marginLeft: '1%'
+    },
     text: {
         fontSize: 25,
         marginLeft: '4%',
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
         height: 130,
         borderRadius: 130/2,
         overflow: "hidden",
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: "grey"
     },
 });

@@ -33,7 +33,7 @@ export default function CharacterDetailsCard(props: { route: any, navigation: an
 const styles = StyleSheet.create({
     card: {
         margin: '2%',
-        marginTop: '8%',
+        marginTop: '7%',
     },
     text: {
         fontSize: 20,
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     },
     paragraph: {
         fontSize: 15,
-        marginLeft: '4%'
+        marginLeft: '8%'
     },
     button: {
         margin: '5%',
@@ -52,8 +52,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     logo: {
-        width: '90%',
-        height: 300,
+        width: '85%',
+        height: '51%',
         borderRadius: 5,
         borderWidth: 2,
         borderColor: "grey"

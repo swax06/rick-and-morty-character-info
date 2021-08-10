@@ -1,7 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Button } from 'react-native-paper';
-import { grey600 } from 'react-native-paper/lib/typescript/styles/colors';
 
 export default function Pagination(props: {nextPage: any , prevPage: any, pageNo: number}) {
     return (

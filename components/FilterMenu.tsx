@@ -12,7 +12,7 @@ export default function FilterMenu(props: { search: any }) {
 
     return (
         <Searchbar
-            placeholder="Search"
+            placeholder="All Characters"
             onChangeText={onChangeSearch}
             value={searchQuery}
         />

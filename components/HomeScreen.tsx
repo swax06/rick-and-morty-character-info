@@ -29,6 +29,7 @@ export default function HomeScreen(props: { navigation: any }) {
       setLoading(false);
       setNextPageUrl(response.data.info.next);
       setPrevPageUrl(response.data.info.prev);
+      setCurrentPageNo((response.data.info.prev !== null) ? (1 + parseInt(response.data.info.prev.split('=')[1])) : 1 );
       setCharacters(response.data.results as character[]);
     }).catch(error => {
       if(error.message === 'Request failed with status code 404')
@@ -38,17 +39,13 @@ export default function HomeScreen(props: { navigation: any }) {
     return () => cancel();
   }, [currentPageUrl]);
 
-  function backToTop() {
-    scrollRef.current?.scrollTo({
-      y: 0,
-      animated: false
-    });
+  function pageChangeAction() {
+    scrollRef.current?.scrollTo({ y: 0, animated: false});
   }
 
   function search(characterName: string) {
     let url: string = 'https://rickandmortyapi.com/api/character';
-    setCurrentPageNo(1);
-    backToTop();
+    pageChangeAction();
     if(characterName)
       url += '/?name=' + characterName;
     setCurrentPageUrl(url);
@@ -56,16 +53,14 @@ export default function HomeScreen(props: { navigation: any }) {
 
   function nextPage() {
     if(!loading){
-      setCurrentPageNo(prevPageNo => prevPageNo + 1);
-      backToTop();
+      pageChangeAction();
       setCurrentPageUrl(nextPageUrl);
     }
   }
 
   function prevPage() {
     if(!loading){
-      setCurrentPageNo(prevPageNo => prevPageNo - 1);
-      backToTop();
+      pageChangeAction();
       setCurrentPageUrl(prevPageUrl);
     }
   }
@@ -74,7 +69,7 @@ export default function HomeScreen(props: { navigation: any }) {
     <View style={styles.container}>
       <FilterMenu search={search}/>
       <View style={{width: '100%', minHeight: '82.5%'}}>
-      {loading && <View style={styles.messageContainer}><Text>{message}</Text></View>}
+      {loading && <View style={styles.messageContainer}><Text style={styles.message}>{message}</Text></View>}
       {!loading && <CharacterList characters={characters} scrollRef={scrollRef} navigation={props.navigation}></CharacterList>}
       </View>
       <Pagination
@@ -90,7 +85,7 @@ const styles = StyleSheet.create({
   container: {
     margin: '2%',
     marginTop: '7%',
-    marginBottom: 185
+    marginBottom: '45%'
   },
   messageContainer: {
     width: "100%",
@@ -98,5 +93,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
+  message: {
+    fontSize: 20,
+    color: 'grey'
+  }
 
 });
