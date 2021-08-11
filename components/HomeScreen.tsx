@@ -6,8 +6,17 @@ import axios from 'axios';
 import { character, response } from '../models';
 import Pagination from './Pagination';
 import FilterMenu from './FilterMenu';
+import { ActivityIndicator, Colors, FAB } from 'react-native-paper';
+import { connect } from 'react-redux';
+import { TextInput } from 'react-native-gesture-handler';
 
-export default function HomeScreen(props: { navigation: any }) {
+const mapStateToProps = (state: any) => {
+    return {
+        ids: state.idReducer.idList
+    }
+}
+
+function HomeScreen(props: { navigation: any, ids: any [] }) {
   const [characters, setCharacters] = useState([] as character[]);
   const [currentPageUrl, setCurrentPageUrl] = useState("https://rickandmortyapi.com/api/character/?status=alive");
   const [nextPageUrl, setNextPageUrl] = useState(String);
@@ -15,7 +24,9 @@ export default function HomeScreen(props: { navigation: any }) {
   const [loading, setLoading] = useState(true);
   const [currentPageNo, setCurrentPageNo] = useState(1);
   const scrollRef: any = useRef<ScrollView>();
+  const searchRef: any = useRef<TextInput>();
   const [message, setMessage] = useState("Loading...");
+  const [historyMode, setHistoryMode] = useState(false);
 
   useEffect(() => {
     let cancel: any;
@@ -27,10 +38,13 @@ export default function HomeScreen(props: { navigation: any }) {
       })
     }).then((response: response) => {
       setLoading(false);
-      setNextPageUrl(response.data.info.next);
-      setPrevPageUrl(response.data.info.prev);
-      setCurrentPageNo((response.data.info.prev !== null) ? (1 + parseInt(response.data.info.prev.split('=')[1])) : 1 );
-      setCharacters(response.data.results as character[]);
+      if(response.data.info !== undefined) {
+        setNextPageUrl(response.data.info.next);
+        setPrevPageUrl(response.data.info.prev);
+        setCurrentPageNo((response.data.info.prev !== null) ? (1 + parseInt(response.data.info.prev.split('=')[1])) : 1 );
+      }
+
+      setCharacters((response.data.results ? response.data.results : response.data) as character[]);
     }).catch(error => {
       if(error.message === 'Request failed with status code 404')
         setMessage("No Results");
@@ -65,18 +79,44 @@ export default function HomeScreen(props: { navigation: any }) {
     }
   }
 
+  function toggleView() {
+    setHistoryMode((historyMode) => !historyMode);
+    let url = 'https://rickandmortyapi.com/api/character/';
+    if(!historyMode){
+      url += '0,';
+      props.ids.forEach((value: {characterId: number}) => {
+        if(value.characterId)
+          url += value.characterId + ',';
+      })
+    }
+    searchRef.current.setNativeProps({ text: ''});
+    setCurrentPageUrl(url);
+  }
+
+
+
   return (
+    
     <View style={styles.container}>
-      <FilterMenu search={search}/>
+      <FilterMenu search={search} historyMode={historyMode} searchRef={searchRef}/>
       <View style={{width: '100%', minHeight: '82.5%'}}>
       {loading && <View style={styles.messageContainer}><Text style={styles.message}>{message}</Text></View>}
       {!loading && <CharacterList characters={characters} scrollRef={scrollRef} navigation={props.navigation}></CharacterList>}
       </View>
-      <Pagination
+      <FAB
+        style={styles.fab}
+        small
+        icon="minus"
+        onPress={toggleView}
+      />
+      <View style={styles.pagination}>
+      {!historyMode && <Pagination
         prevPage={prevPageUrl ? prevPage : null}
         nextPage={nextPageUrl ? nextPage : null}
         pageNo={currentPageNo}
-      />
+      />}
+      </View>
+      
     </View>
   );
 }
@@ -96,6 +136,15 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 20,
     color: 'grey'
+  },
+  fab: {
+    position: 'absolute',
+    right: 4,
+    top: 4
+  },
+  pagination: {
   }
 
 });
+
+export default connect(mapStateToProps) (HomeScreen);

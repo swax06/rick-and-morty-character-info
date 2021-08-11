@@ -2,8 +2,26 @@ import React from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { character } from '../models'
 import { Avatar, Button, Card, Title, Paragraph } from 'react-native-paper';
+import { connect } from 'react-redux';
+import { addCharacterId } from '../actions/CharacterId'
 
-export default function characterCard(props: { character: character, navigation: any }) {
+const mapStateToProps = (state: any) => {
+    return {
+        ids: state.idReducer.idList
+    }
+}
+
+const mapDispatchProps = (dispatch: any) => {
+    return {
+        add: (id: number) => dispatch(addCharacterId(id))
+    }
+}
+
+function CharacterCard(props: { character: character, navigation: any, add: any }) {
+    function details() {
+        props.navigation.navigate("Character Details", { character: props.character });
+        props.add(props.character.id);
+    }
     return (
         <View>
             <Card mode='outlined' style={styles.card}>
@@ -14,7 +32,7 @@ export default function characterCard(props: { character: character, navigation:
                             title={(props.character.name.length < 17) ? props.character.name : (props.character.name.substr(0, 15) + '..')}
                             subtitle={props.character.status + ' - ' + props.character.species} />
                         <Card.Actions style={styles.action}>
-                            <Button mode="outlined" onPress = {() => props.navigation.navigate("Character Details", {character: props.character})}>Details</Button>
+                            <Button mode="outlined" onPress={details}>Details</Button>
                         </Card.Actions>
                     </View>
 
@@ -45,9 +63,11 @@ const styles = StyleSheet.create({
     logo: {
         width: 130,
         height: 130,
-        borderRadius: 130/2,
+        borderRadius: 130 / 2,
         overflow: "hidden",
         borderWidth: 1,
         borderColor: "grey"
     },
 });
+
+export default connect(mapStateToProps, mapDispatchProps)(CharacterCard);
